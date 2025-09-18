@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take a Deep Breath</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .main-text {
+            font-size: 8vw;
+            font-weight: 200;
+            letter-spacing: 0.5vw;
+            animation: breathe 5s ease-in-out infinite;
+        }
+
+        .what-why-how {
+            position: absolute;
+            bottom: 20px;
+            font-size: 1.5vw;
+            font-weight: 200;
+            letter-spacing: 0.1vw;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.3s ease;
+        }
+
+        .what-why-how:hover {
+            color: #fff;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #111;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #333;
+            width: 70%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
+            border-radius: 8px;
+        }
+
+        .modal-content a {
+            color: #1155cc;
+            text-decoration: underline;
+        }
+
+        .modal-content a:hover {
+            color: #3366dd;
+        }
+
+        .prompts-section {
+            color: #666;
+            font-style: italic;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        #video-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+
+        .video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .video-player.active {
+            display: block;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 18px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-text {
+                font-size: 15vw;
+            }
+
+            .what-why-how {
+                font-size: 4vw;
+            }
+
+            .modal-content {
+                font-size: 14px;
+                padding: 15px;
+                width: 95%;
+                max-width: none;
+                margin: 20px auto;
+                border: none;
+                max-height: 85vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-container">
+        <div class="main-text">
+            TAKE A<br>
+            DEEP<br>
+            BREATH
+        </div>
+        <div class="what-why-how" id="what-why-how-link">whatwhyhow?</div>
+    </div>
+
+    <div id="video-container">
+        <div class="loading-indicator" id="loading-indicator">breathe.</div>
+        <video id="video-player-1" class="video-player" autoplay muted playsinline preload="auto"></video>
+        <video id="video-player-2" class="video-player" autoplay muted playsinline preload="auto"></video>
+    </div>
+
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <p>Breath marks the human body's arrival and departure.</p>
+            
+            <p>This work, echoing <a href="https://thispersondoesnotexist.com" target="_blank">thispersondoesnotexist.com</a>, stages the uncanny encounter of watching AI-generated humans breathe. In shifting from portrait to respiration, it explores how digital figures acquire affective presence, and how the minimal act of inhalation and exhalation unsettles our sense of the real.</p>
+            
+            <p>Created by creative technologist <a href="http://www.tina.zone" target="_blank">Tina Tarighian</a>, the project examines the threshold where simulation becomes visceral. One hundred video studies were generated with Google's Veo model.</p>
+            
+            <p class="prompts-section">prompts: real person breathing, real breathing, human breath, person breathing, person breathing hard, person breathing soft, human breathing in, human breathing out, human breathing in relief, human taking a breath, someone breathing, someone breathing loudly, human breathin, person taking a breath, person taking a short breath, person taking a deep breath</p>
+        </div>
+    </div>
+
+    <script>
+        const videoFiles = [
+            "breathvideos/download - 2025-09-17T133733.583.mp4",
+            "breathvideos/Human_breathing_202509171258_4ak06.mp4",
+            "breathvideos/Human_breathing_202509171258_6vd9k.mp4",
+            "breathvideos/Human_breathing_202509171258_9jlci.mp4",
+            "breathvideos/Human_breathing_202509171258_tw99z.mp4",
+            "breathvideos/Human_breathing_in_202509171332_7twid.mp4",
+            "breathvideos/Human_breathing_in_202509171332_ffmul.mp4",
+            "breathvideos/Human_breathing_in_202509171332_kq9a8.mp4",
+            "breathvideos/Human_breathing_in_202509171332_xx3jg.mp4",
+            "breathvideos/Human_breathing_in_202509171337_a00fp.mp4",
+            "breathvideos/Human_breathing_in_202509171337_pdx1d.mp4",
+            "breathvideos/Human_breathing_in_202509171338_9sboy.mp4",
+            "breathvideos/Human_breathing_in_202509171338_x37un.mp4",
+            "breathvideos/Human_breathing_out_202509171333_6bhlt.mp4",
+            "breathvideos/Human_breathing_out_202509171333_ssw1t.mp4",
+            "breathvideos/Human_taking_a_202509171258_3am2g.mp4",
+            "breathvideos/Human_taking_a_202509171258_56gum.mp4",
+            "breathvideos/Human_taking_a_202509171258_vvlmx.mp4",
+            "breathvideos/Human_taking_a_202509171259_gb6pa.mp4",
+            "breathvideos/Human_taking_a_202509171306_4cko0.mp4",
+            "breathvideos/Human_taking_a_202509171306_5mj2m.mp4",
+            "breathvideos/Human_taking_a_202509171306_6pxig.mp4",
+            "breathvideos/Human_taking_a_202509171306_ftkbn.mp4",
+            "breathvideos/Person_breathing_202509171255_8wixc.mp4",
+            "breathvideos/Person_breathing_202509171255_9ui6x.mp4",
+            "breathvideos/Person_breathing_202509171255_q0say.mp4",
+            "breathvideos/Person_breathing_202509171338_4nx56.mp4",
+            "breathvideos/Person_breathing_202509171342_3tdsf.mp4",
+            "breathvideos/Person_breathing_202509171342_gh5xp.mp4",
+            "breathvideos/Person_breathing_202509171342_ubvve.mp4",
+            "breathvideos/Person_breathing_202509171343_7h7xo.mp4",
+            "breathvideos/Person_breathing_202509171357_934eq.mp4",
+            "breathvideos/Person_breathing_202509171357_p23p8.mp4",
+            "breathvideos/Person_breathing_202509171357_v7t7x.mp4",
+            "breathvideos/Person_breathing_202509171357_vyyxa.mp4",
+            "breathvideos/Person_breathing_202509171549_9f9ub.mp4",
+            "breathvideos/Person_breathing_202509171549_cd15o.mp4",
+            "breathvideos/Person_breathing_202509171550_1emuh.mp4",
+            "breathvideos/Person_breathing_202509171550_kx2ak.mp4",
+            "breathvideos/Person_breathing_202509171550_tse3w.mp4",
+            "breathvideos/Person_breathing_202509171550_xlefa.mp4",
+            "breathvideos/Person_breathing_202509171550_yer4x.mp4",
+            "breathvideos/Person_breathing_202509181330_3y1lw.mp4",
+            "breathvideos/Person_breathing_202509181330_38dzn.mp4",
+            "breathvideos/Person_breathing_202509181330_gonxp.mp4",
+            "breathvideos/Person_breathing_202509181330_ku2ne.mp4",
+            "breathvideos/Person_breathing_202509181330_mq0s8.mp4",
+            "breathvideos/Person_breathing_202509181330_scnxq.mp4",
+            "breathvideos/Person_breathing_202509181331_wea9e.mp4",
+            "breathvideos/Person_breathing_202509181331_xlsqp.mp4",
+            "breathvideos/Person_breathing_202509181334_6tffo.mp4",
+            "breathvideos/Person_breathing_202509181334_8z53h.mp4",
+            "breathvideos/Person_breathing_202509181334_049q4.mp4",
+            "breathvideos/Person_breathing_202509181334_c56js.mp4",
+            "breathvideos/Person_breathing_202509181334_drfku.mp4",
+            "breathvideos/Person_breathing_202509181334_ud7e5.mp4",
+            "breathvideos/Person_breathing_202509181334_usjgo.mp4",
+            "breathvideos/Person_breathing_202509181334_w8nhj.mp4",
+            "breathvideos/Person_breathing_hard_202509181034_002sc.mp4",
+            "breathvideos/Person_breathing_hard_202509181034_tkiel.mp4",
+            "breathvideos/Person_breathing_hard_202509181035_d0cmw.mp4",
+            "breathvideos/Person_breathing_hard_202509181325_1j27l.mp4",
+            "breathvideos/Person_breathing_hard_202509181325_6sqkf.mp4",
+            "breathvideos/Person_breathing_hard_202509181325_ojqtc.mp4",
+            "breathvideos/Person_breathing_hard_202509181325_zbanz.mp4",
+            "breathvideos/Person_breathing_soft_202509171357_hp6he.mp4",
+            "breathvideos/Person_breathing_soft_202509171357_mfs0c.mp4",
+            "breathvideos/Person_breathing_soft_202509171357_ytjxt.mp4",
+            "breathvideos/Person_breathing_soft_202509171546_c7b61.mp4",
+            "breathvideos/Person_breathing_soft_202509171546_xlmsv.mp4",
+            "breathvideos/Person_breathing_soft_202509181034_8m3to.mp4",
+            "breathvideos/Person_breathing_soft_202509181034_19co1.mp4",
+            "breathvideos/Person_breathing_soft_202509181034_jtm88.mp4",
+            "breathvideos/Person_breathing_soft_202509181325_0zufh.mp4",
+            "breathvideos/Person_breathing_soft_202509181325_24wrx.mp4",
+            "breathvideos/Person_taking_a_202509171147_7fdig.mp4",
+            "breathvideos/Person_taking_a_202509171147_16wgf.mp4",
+            "breathvideos/Person_taking_a_202509171147_ghjtr.mp4",
+            "breathvideos/Person_taking_a_202509171147_k1ykv.mp4",
+            "breathvideos/Person_taking_a_202509171147_slm65.mp4",
+            "breathvideos/Person_taking_a_202509171147_vnju0.mp4",
+            "breathvideos/Person_taking_a_202509171147_ygtur.mp4",
+            "breathvideos/Person_taking_a_202509171254_5yycc.mp4",
+            "breathvideos/Person_taking_a_202509171254_aesgp.mp4",
+            "breathvideos/Person_taking_a_202509171254_vfdcu.mp4",
+            "breathvideos/Person_taking_a_202509171255_musnd.mp4",
+            "breathvideos/Real_breathing_202509181358_mkzco.mp4",
+            "breathvideos/Real_breathing_202509181358_uw9ib.mp4",
+            "breathvideos/Real_breathing_202509181358_xop16.mp4",
+            "breathvideos/Real_breathing_202509181358_z5szp.mp4",
+            "breathvideos/Real_person_breathing_202509181357_06wxm.mp4",
+            "breathvideos/Real_person_breathing_202509181357_sc69a.mp4",
+            "breathvideos/Real_person_breathing_202509181358_6bhvb.mp4",
+            "breathvideos/Real_person_breathing_202509181402_c4ldh.mp4",
+            "breathvideos/Real_person_breathing_202509181402_crf71.mp4",
+            "breathvideos/Someone_breathing_202509171305_8qnfz.mp4",
+            "breathvideos/Someone_breathing_202509171305_iz1f8.mp4",
+            "breathvideos/Someone_breathing_202509171305_wo9f1.mp4",
+            "breathvideos/Someone_breathing_202509171305_wsapj.mp4",
+            "breathvideos/Someone_breathing_loudly_202509171305_hay5v.mp4",
+            "breathvideos/Someone_breathing_loudly_202509171305_rdvuj.mp4",
+            "breathvideos/Someone_breathing_loudly_202509171305_rfbcl.mp4"
+        ];
+
+        const mainContainer = document.getElementById('main-container');
+        const videoContainer = document.getElementById('video-container');
+        const modal = document.getElementById('info-modal');
+        const whatWhyHowLink = document.getElementById('what-why-how-link');
+        const closeModal = document.getElementById('close-modal');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        const videoPlayer1 = document.getElementById('video-player-1');
+        const videoPlayer2 = document.getElementById('video-player-2');
+
+        let shuffledFiles = [...videoFiles];
+        let videoFileIndex = 0;
+        let activePlayer = null;
+        let nextPlayer = null;
+        let isTransitioning = false;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function preloadNextVideo() {
+            return new Promise((resolve) => {
+                const nextIndex = (videoFileIndex + 1) % shuffledFiles.length;
+                
+                nextPlayer.addEventListener('canplay', () => resolve(), { once: true });
+                nextPlayer.src = shuffledFiles[nextIndex];
+                nextPlayer.load();
+            });
+        }
+
+        async function switchToNextPlayer() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // Make sure next video is ready
+            if (nextPlayer.readyState < 3) {
+                await new Promise(resolve => {
+                    nextPlayer.addEventListener('canplay', resolve, { once: true });
+                });
+            }
+
+            // Immediate switch - no fades
+            if (activePlayer) {
+                activePlayer.classList.remove('active');
+            }
+            
+            nextPlayer.currentTime = 0;
+            nextPlayer.classList.add('active');
+            
+            // Start playing immediately
+            await nextPlayer.play().catch(e => console.log('Play error:', e));
+
+            // Swap players
+            [activePlayer, nextPlayer] = [nextPlayer, activePlayer];
+            
+            // Update index and preload next video
+            videoFileIndex = (videoFileIndex + 1) % shuffledFiles.length;
+            
+            // Preload in background
+            preloadNextVideo();
+            isTransitioning = false;
+        }
+
+        // Enhanced video loading with better error handling
+        function loadVideoSafely(video, src) {
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Video load timeout'));
+                }, 10000);
+
+                video.addEventListener('canplaythrough', () => {
+                    clearTimeout(timeout);
+                    resolve();
+                }, { once: true });
+
+                video.addEventListener('error', () => {
+                    clearTimeout(timeout);
+                    reject(new Error('Video load error'));
+                }, { once: true });
+
+                video.src = src;
+                video.load();
+            });
+        }
+
+        mainContainer.addEventListener('click', async () => {
+            mainContainer.style.display = 'none';
+            videoContainer.style.display = 'block';
+            loadingIndicator.style.display = 'block';
+            
+            shuffle(shuffledFiles);
+            videoFileIndex = 0;
+
+            try {
+                // Initialize first video
+                activePlayer = videoPlayer1;
+                nextPlayer = videoPlayer2;
+
+                await loadVideoSafely(activePlayer, shuffledFiles[videoFileIndex]);
+                
+                // Make sure video is fully ready before playing
+                if (activePlayer.readyState < 3) {
+                    await new Promise(resolve => {
+                        activePlayer.addEventListener('canplay', resolve, { once: true });
+                    });
+                }
+
+                activePlayer.muted = false;
+                activePlayer.classList.add('active');
+                await activePlayer.play();
+                
+                loadingIndicator.style.display = 'none';
+
+                // Preload next video and wait for it to be ready
+                videoFileIndex = (videoFileIndex + 1) % shuffledFiles.length;
+                await preloadNextVideo();
+
+            } catch (error) {
+                console.error('Video initialization failed:', error);
+                loadingIndicator.textContent = 'Loading failed. Click to retry.';
+                loadingIndicator.style.cursor = 'pointer';
+                loadingIndicator.onclick = () => location.reload();
+            }
+        });
+
+        // Better event handling for smooth transitions
+        videoPlayer1.addEventListener('ended', switchToNextPlayer);
+        videoPlayer2.addEventListener('ended', switchToNextPlayer);
+
+        // Enhanced modal interactions
+        whatWhyHowLink.addEventListener('click', (event) => {
+            event.stopPropagation();
+            modal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>
