@@ -53,14 +53,17 @@
         }
 
         .what-why-how {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 1.5vw;
             font-weight: 200;
             letter-spacing: 0.1vw;
             cursor: pointer;
             color: #555555;
             transition: color 0.3s ease;
+            z-index: 1000;
         }
 
         .what-why-how:hover {
@@ -242,6 +245,7 @@
 
             .what-why-how {
                 font-size: 4vw;
+                bottom: 15px;
             }
 
             .modal-content {
@@ -283,8 +287,9 @@
             DEEP<br>
             BREATH
         </div>
-        <div class="what-why-how" id="what-why-how-link">whatwhyhow?</div>
     </div>
+
+    <div class="what-why-how" id="what-why-how-link">???????</div>
 
     <div id="video-container">
         <div class="loading-indicator" id="loading-indicator">breathe.</div>
