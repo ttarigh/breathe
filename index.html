@@ -288,8 +288,8 @@
 
     <div id="video-container">
         <div class="loading-indicator" id="loading-indicator">breathe.</div>
-        <video id="video-player-1" class="video-player" autoplay muted playsinline preload="auto"></video>
-        <video id="video-player-2" class="video-player" autoplay muted playsinline preload="auto"></video>
+        <video id="video-player-1" class="video-player" playsinline preload="none" muted></video>
+        <video id="video-player-2" class="video-player" playsinline preload="none" muted></video>
     </div>
 
     <div id="info-modal" class="modal">
@@ -458,6 +458,10 @@
             return new Promise((resolve) => {
                 const nextIndex = (videoFileIndex + 1) % shuffledFiles.length;
                 
+                // Ensure the next player is muted during preload
+                nextPlayer.muted = true;
+                nextPlayer.currentTime = 0;
+                
                 nextPlayer.addEventListener('canplay', () => resolve(), { once: true });
                 nextPlayer.src = shuffledFiles[nextIndex];
                 nextPlayer.load();
@@ -475,12 +479,16 @@
                 });
             }
 
-            // Immediate switch - no fades
+            // Stop and mute the current player completely
             if (activePlayer) {
+                activePlayer.pause();
+                activePlayer.muted = true;
                 activePlayer.classList.remove('active');
             }
             
+            // Prepare the next player for playback
             nextPlayer.currentTime = 0;
+            nextPlayer.muted = false; // Unmute for audio
             nextPlayer.classList.add('active');
             
             // Start playing immediately
@@ -492,7 +500,7 @@
             // Update index and preload next video
             videoFileIndex = (videoFileIndex + 1) % shuffledFiles.length;
             
-            // Preload in background
+            // Preload in background (this will be muted)
             preloadNextVideo();
             isTransitioning = false;
         }
@@ -532,6 +540,10 @@
                 activePlayer = videoPlayer1;
                 nextPlayer = videoPlayer2;
 
+                // Ensure both players start with correct muted state
+                activePlayer.muted = true;
+                nextPlayer.muted = true;
+
                 await loadVideoSafely(activePlayer, shuffledFiles[videoFileIndex]);
                 
                 // Make sure video is fully ready before playing
@@ -541,6 +553,8 @@
                     });
                 }
 
+                // Reset to beginning and unmute for playback
+                activePlayer.currentTime = 0;
                 activePlayer.muted = false;
                 activePlayer.classList.add('active');
                 await activePlayer.play();
