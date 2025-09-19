@@ -138,6 +138,69 @@
             color: #fff;
         }
 
+        .data-viz-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #0a0a0a;
+            border-radius: 6px;
+            border: 1px solid #222;
+        }
+
+        .chart-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .chart-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .pie-chart {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            position: relative;
+            background: #333;
+            overflow: hidden;
+        }
+
+        .pie-chart::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#888 0deg, #888 0deg, transparent 0deg, transparent 360deg);
+            transform: rotate(-90deg);
+            transition: all 0.1s ease-out;
+        }
+
+        .chart-label {
+            font-size: 12px;
+            text-align: center;
+            color: #ccc;
+            font-weight: 300;
+        }
+
+        .data-disclaimer {
+            font-size: 11px;
+            font-style: italic;
+            color: #666;
+            text-align: center;
+            margin: 0;
+            line-height: 1.3;
+        }
+
         #video-container {
             display: none;
             position: fixed;
@@ -190,6 +253,25 @@
                 border: none;
                 max-height: 85vh;
             }
+
+            .chart-row {
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .chart-item {
+                min-width: 80px;
+                flex: 1;
+            }
+
+            .pie-chart {
+                width: 50px;
+                height: 50px;
+            }
+
+            .chart-label {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
@@ -218,6 +300,26 @@
             <p>Like <a href="https://thispersondoesnotexist.com" target="_blank">thispersondoesnotexist.com</a>, Deep Breath stages the uncanny encounter of watching AI-generated humans breathe. The minimal act of inhalation and exhalation unsettles our sense of the real.</p>
             
             <p>Created by creative technologist <a href="http://www.tina.zone" target="_blank">Tina Tarighian</a>, the project examines the threshold where simulation becomes visceral. One hundred video studies were generated with Google's Veo model.</p>
+            
+            <p>Despite giving no descriptive prompts about identity or appearance, some interesting patterns emerged in the model's output:</p>
+            
+            <div class="data-viz-container">
+                <div class="chart-row">
+                    <div class="chart-item">
+                        <div class="pie-chart" id="race-chart"></div>
+                        <div class="chart-label">84% appeared white</div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="pie-chart" id="gender-chart"></div>
+                        <div class="chart-label">67% appeared as women</div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="pie-chart" id="clothing-chart"></div>
+                        <div class="chart-label">24% appeared shirtless</div>
+                    </div>
+                </div>
+                <p class="data-disclaimer">* these categories impose human constructs onto synthetic renderings</p>
+            </div>
             
             <p class="prompts-section">prompts: real person breathing, real breathing, human breath, person breathing, person breathing hard, person breathing soft, human breathing in, human breathing out, human breathing in relief, human taking a breath, someone breathing, someone breathing loudly, human breathin, person taking a breath, person taking a short breath, person taking a deep breath</p>
         </div>
@@ -465,6 +567,8 @@
         whatWhyHowLink.addEventListener('click', (event) => {
             event.stopPropagation();
             modal.style.display = 'flex';
+            // Trigger chart animations when modal opens
+            setTimeout(initializeCharts, 100);
         });
 
         closeModal.addEventListener('click', () => {
@@ -483,6 +587,46 @@
                 modal.style.display = 'none';
             }
         });
+
+        // Animate pie charts with smooth timelapse effect
+        function animatePieChart(elementId, percentage, color = '#888', delay = 0) {
+            const chart = document.getElementById(elementId);
+            const targetAngle = (percentage / 100) * 360;
+            const duration = 2000; // 2 seconds
+            let startTime = null;
+            
+            // Reset to 0 degrees
+            chart.style.background = `conic-gradient(${color} 0deg, ${color} 0deg, transparent 0deg, transparent 360deg)`;
+            
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Use easeOutCubic for smooth animation
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentAngle = eased * targetAngle;
+                
+                // Update the conic gradient to show progress like a clock
+                chart.style.background = `conic-gradient(${color} 0deg, ${color} ${currentAngle}deg, transparent ${currentAngle}deg, transparent 360deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            
+            // Start animation after delay
+            setTimeout(() => {
+                requestAnimationFrame(animate);
+            }, delay);
+        }
+
+        // Initialize charts when modal opens
+        function initializeCharts() {
+            animatePieChart('race-chart', 84, '#888', 200);     // Start after 200ms
+            animatePieChart('gender-chart', 67, '#999', 600);   // Start after 600ms  
+            animatePieChart('clothing-chart', 24, '#777', 1000); // Start after 1000ms
+        }
 
     </script>
 </body>
